@@ -2,7 +2,7 @@ import pylab
 
 class Calculate:
     def __init__(self) -> None:
-        pass
+        self.function_text = "2x^2 + 3x + 2"
 
     def f(self, x):
         ans = 0
