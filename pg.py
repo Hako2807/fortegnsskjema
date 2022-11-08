@@ -2,6 +2,7 @@ import pygame
 from sys import exit
 import math
 import numpy
+import time
 
 COLOR = (255, 255, 255)
 
@@ -9,6 +10,10 @@ def draw_dashed_line(surf, color, start_pos, end_pos, width=1, dash_length=10):
     x1, y1 = start_pos
     x2, y2 = end_pos
     dl = dash_length
+    x1 = int(x1)
+    x2 = int(x2)
+    y1 = int(y1)
+    y2 = int(y2)
 
     if (x1 == x2):
         ycoords = [y for y in range(y1, y2, dl if y1 < y2 else -dl)]
@@ -48,17 +53,21 @@ class Display:
         self.clock = pygame.time.Clock()
         self.frame = 0
 
+        self.calc = calcs
         self.font = pygame.font.Font("assets/computer_classic.ttf", 20)
         self.min_x = 100
         self.max_x = self.w - self.min_x
-        self.numbers = [-1, 0, 2]
+        self.numbers = self.calc.factors
 
         self.function_text = calcs.function_text
+        self.fconst = self.calc.factors[0]
+        self.factors = sorted(self.calc.factors[1::])
+        
     
     def check_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                # pygame.image.save(self.screen, "assets/test1.png")
+                pygame.image.save(self.screen, f"assets/{int(time.time() % 10000)}fortegnsskjema.png")
                 pygame.quit()
                 exit()
     
@@ -77,8 +86,9 @@ class Display:
         self.screen.blit(font_surf, pos)
 
     def update_screen(self):
-
-        x_vals = self.calculate_start_end(100, self.max_x, self.numbers)
+        cse = [i for i in self.factors]
+        cse.append(self.fconst)
+        x_vals = self.calculate_start_end(100, self.max_x, sorted(cse))
         print(x_vals)
 
 
@@ -96,16 +106,21 @@ class Display:
         self.print_to_screen("<", (self.min_x - 28, 77))
         self.print_to_screen(">", (self.max_x + 15, 77))
 
-        self.show_row(0, -1, x_vals)
-        self.show_row(1, 2, x_vals)
-        self.show_row(2, 0, x_vals)
+        if self.fconst != 0 or self.fconst != 1:
+            self.print_to_screen(str(self.fconst), (20, 140))
 
+        for i in range(1, len(self.factors)):
+            if i < len(self.factors) - 1:
+                self.show_row(i, self.factors[i + 1], x_vals)
+            else:
+                self.show_row(i, self.factors[i], x_vals)
         
         pygame.display.flip()
 
     def calculate_start_end(self, x1, x2, numbers):
         difference = x2 - x1
         dv = numbers[-1] - numbers[0]
+        if dv == 0: dv = 1
         space = difference / dv
         print(difference, space, dv)
 
@@ -124,20 +139,20 @@ class Display:
     def paint_line(self, index, x0, xvals):
         for i in range(len(xvals)):
             if i < len(xvals) - 1:
-                if int(xvals[i][0]) < x0:
-                    draw_dashed_line(self.screen, COLOR, (int(xvals[i][1]), 140 + index * 50), (int(xvals[i + 1][1]), 140 + index * 50), dash_length= 5)
-                elif int(xvals[i][0]) > x0:
-                    pygame.draw.line(self.screen, COLOR, (int(xvals[i][1]), 140 + index * 50), (int(xvals[i + 1][1]), 140 + index * 50))
+                if float(xvals[i][0]) < x0:
+                    draw_dashed_line(self.screen, COLOR, (float(xvals[i][1]), 140 + index * 50), (float(xvals[i + 1][1]), 140 + index * 50), dash_length= 5)
+                elif float(xvals[i][0]) > x0:
+                    pygame.draw.line(self.screen, COLOR, (float(xvals[i][1]), 140 + index * 50), (float(xvals[i + 1][1]), 140 + index * 50))
                 else:
-                    self.print_to_screen("0", (int(xvals[i][1]), 140 + index * 50 - 10))
-                    if int(xvals[i][0]) + 0.1 < x0:
-                        draw_dashed_line(self.screen, COLOR, (int(xvals[i][1]) + 15, 140 + index * 50), (int(xvals[i + 1][1]), 140 + index * 50), dash_length= 5)
-                    elif int(xvals[i][0]) + 0.1 > x0:
-                        pygame.draw.line(self.screen, COLOR, (int(xvals[i][1]) + 15, 140 + index * 50), (int(xvals[i + 1][1]), 140 + index * 50))
+                    self.print_to_screen("0", (float(xvals[i][1]), 140 + index * 50 - 10))
+                    if float(xvals[i][0]) + 0.1 < x0:
+                        draw_dashed_line(self.screen, COLOR, (float(xvals[i][1]) + 15, 140 + index * 50), (float(xvals[i + 1][1]), 140 + index * 50), dash_length= 5)
+                    elif float(xvals[i][0]) + 0.1 > x0:
+                        pygame.draw.line(self.screen, COLOR, (float(xvals[i][1]) + 15, 140 + index * 50), (float(xvals[i + 1][1]), 140 + index * 50))
 
 
             else: 
-                if int(xvals[i][0]) < x0:
-                    draw_dashed_line(self.screen, COLOR, (int(xvals[i][1]), 140 + index * 50), (self.max_x, 140 + index * 50), dash_length=5)
-                elif int(xvals[i][0]) > x0:
-                    pygame.draw.line(self.screen, COLOR, (int(xvals[i][1]), 140 + index * 50), (self.max_x, 140 + index * 50))
+                if float(xvals[i][0]) < x0:
+                    draw_dashed_line(self.screen, COLOR, (float(xvals[i][1]), 140 + index * 50), (self.max_x, 140 + index * 50), dash_length=5)
+                elif float(xvals[i][0]) > x0:
+                    pygame.draw.line(self.screen, COLOR, (float(xvals[i][1]), 140 + index * 50), (self.max_x, 140 + index * 50))

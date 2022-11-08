@@ -2,7 +2,13 @@ import pylab
 
 class Calculate:
     def __init__(self) -> None:
-        self.function_text = "2x^2 + 3x + 2"
+        a = input("a: ")
+        b = input("b: ")
+        c = input("c: ")
+        self.degree = 2
+        self.constants = [int(a), int(b), int(c)]
+        self.function_text = f"{a}x^2 + {b}x + {c}"
+        self.factors = self.factorize_second_degree()
 
     def f(self, x):
         ans = 0
