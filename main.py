@@ -9,7 +9,7 @@ def main():
     #calc.make_function(calc)
     #calc.calculate_fortegn(calc, calc.factorize_second_degree(calc))
 
-    disp = pg.Display(500, 500, calc)
+    disp = pg.Display(700, 500, calc)
     while True:
         disp.tick()
     
